@@ -20,7 +20,7 @@ jobs:
 
       - name: Install Composer dependencies
         run: |
-          composer install --no-dev --optimize-autoloader
+          composer update --no-dev --optimize-autoloader
           php artisan key:generate
 
       - name: Deploy to EC2
