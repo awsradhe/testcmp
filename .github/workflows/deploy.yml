@@ -3,7 +3,7 @@ name: Deploy Laravel to EC2
 on:
   push:
     branches:
-      - main  # Deploy on push to the main branch
+      - main  # Deploy on push to main branch
 
 jobs:
   deploy:
@@ -27,6 +27,9 @@ jobs:
           fi
           php artisan key:generate
 
+      - name: Make deploy.sh executable
+        run: chmod +x ./deploy.sh
+
       - name: Deploy to EC2
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
@@ -35,4 +38,7 @@ jobs:
         run: |
           echo "$EC2_KEY" > private_key.pem
           chmod 600 private_key.pem
-          ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST 'bash -s' < ./deploy.sh
+          ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
+            cd /var/www/html/testcmp  # Change to your project directory on EC2
+            bash ./deploy.sh
+          EOF
