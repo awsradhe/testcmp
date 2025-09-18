@@ -3,39 +3,34 @@ name: Deploy Laravel to EC2
 on:
   push:
     branches:
-      - main  # Deploy on push to main branch
+      - main  # Deploy on push to the main branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code from GitHub repository
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up PHP (Ensure correct PHP version for your project)
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.0'  # Adjust this to your version of PHP
 
-      # Step 3: Install Composer dependencies
       - name: Install Composer dependencies
         run: |
-          composer install --no-dev --optimize-autoloader --no-interaction -vvv
+          composer install --no-dev --optimize-autoloader -vvv
+          # Create .env file from .env.example if it does not exist
+          cp .env.example .env
           php artisan key:generate
 
-      # Step 4: Deploy to EC2
       - name: Deploy to EC2
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
           EC2_KEY: ${{ secrets.EC2_KEY }}
         run: |
-          # Save EC2 SSH Key from GitHub secrets and adjust file permissions
           echo "$EC2_KEY" > private_key.pem
           chmod 600 private_key.pem
-
-          # SSH into EC2 instance and run the deployment script
           ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST 'bash -s' < ./deploy.sh
