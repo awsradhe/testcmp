@@ -22,7 +22,9 @@ jobs:
         run: |
           composer install --no-dev --optimize-autoloader -vvv
           # Create .env file from .env.example if it does not exist
-          cp .env.example .env
+          if [ ! -f .env ]; then
+            cp .env.example .env
+          fi
           php artisan key:generate
 
       - name: Deploy to EC2
