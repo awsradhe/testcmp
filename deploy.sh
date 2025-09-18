@@ -10,7 +10,7 @@
     # SSH into EC2 and run the deploy script
     ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
       # Change to your project directory (replace with actual directory if needed)
-      cd /var/www/html/textcmp || exit 1
+      cd /var/www/html/testcmp || exit 1
 
       # Ensure the deploy.sh file is available
       if [ ! -f deploy.sh ]; then
